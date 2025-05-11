@@ -151,6 +151,22 @@
   </template>
 
   <script>
+
+    function extractIngredientData(sectionElement) {
+        const inputs = sectionElement.querySelectorAll('input[type="number"]');
+        const data = {};
+
+        inputs.forEach(input => {
+            const name = input.name || input.id;
+            const value = parseFloat(input.value);
+            if (!isNaN(value)) {
+            data[name] = value;
+            }
+        });
+
+        return data;
+    }
+
     const getIngredientNameInput = () => document.getElementById('ingredientName');
     const getFlourOrIngredientInput = () => document.getElementById('flourOrIngredient');
     const template = document.getElementById('ingredient-template');
@@ -182,6 +198,45 @@
       nameInput.value = '';
     });
 
+    document.getElementById('addDough').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const loggedIn = await isLoggedIn();
+        if (!loggedIn) {
+            window.location.href = '../pages/login.html';
+            return;
+        }
+
+        const floursData = extractIngredientData(document.getElementById('flours'));
+        const ingredientsData = extractIngredientData(document.getElementById('otherIngredients'));
+
+        const payload = {
+            flours: floursData,
+            ingredients: ingredientsData
+        };
+
+        try {
+            const response = await fetch('http://localhost:8000/api/submit-dough', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+
+            if (!response.ok) {
+            throw new Error("Server responded with status: " + response.status);
+            }
+
+            alert("Dough recipe submitted successfully!");
+        } catch (error) {
+            console.error("Failed to submit:", error);
+            alert("Failed to submit dough recipe.");
+        }
+    });
+
+
     async function isLoggedIn() {
         return new Promise(resolve=> {
             setTimeout(()=> {
@@ -191,5 +246,6 @@
         })
     }
   </script>
+  
 </body>
 </html>
