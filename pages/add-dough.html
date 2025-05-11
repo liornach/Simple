@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        label, input, select, option, button{
+            display: block;
+        }
+
+        #newFlourOrIngredient {
+            display: block;
+            border: 2px solid blueviolet;
+            margin-left: 2px;
+            width: fit-content;
+        }
+    </style>
+
+</head>
+<body>
+    <form id="addDough">
+        <label for="water">Water</label>
+        <input type="number" name="water" id="water">
+        <label for="flour">Flour</label>
+        <input type="number" name="flour" id="flour">
+
+        <div id="newFlourOrIngredient">
+            <p>Add new flour or ingredient:</p>
+            <label for="ingredientName">Name:</label>
+            <input type="text" name="ingredient-name" id="ingredientName">
+            <label for="flourOrIngredient">Flour or ingredient?</label>
+            <select name="flour-or-ingredient" id="flourOrIngredient">
+                <option value="flour">Flour</option>
+                <option value="ingredient">Ingredient</option>
+            </select>
+            <button type="button" id="addIngredientButton">Add ingredient</button>
+        </div>
+        <button>submit</button>
+    </form>
+
+    <script>
+
+        const getIngredientNameInput = ()=> document.getElementById('ingredientName');
+        const getFlourOrIngredientInput = ()=> document.getElementById('flourOrIngredient');
+
+        document.getElementById('addIngredientButton').addEventListener('click', (e)=> {
+            e.preventDefault();
+            const nameInput = getIngredientNameInput();
+            const name = nameInput.value;
+            const flourOrIngredientInput = getFlourOrIngredientInput();
+            const isFlour = flourOrIngredientInput.value;
+            
+            
+        })
+    </script>    
+</body>
+</html>
