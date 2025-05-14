@@ -49,6 +49,7 @@ class DoughRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
+        #is that really needed? It's already in the do_OPTIONS method 
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(b"Server is running.")
