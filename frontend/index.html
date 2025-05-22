@@ -1,27 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            margin: 0;            /* Reset default margin */
-        }
-        iframe {
-            display: block;       /* iframes are inline by default */
-            background: #000;
-            border: none;         /* Reset default border */
-            height: 100vh;        /* Viewport-relative units */
-            width: 100vw;
-        }        
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dough Calculator</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script type="module" src="./components/web-components/navigation-component.js"></script>
 </head>
 <body>
-    <div id="app">
-        <div id="navigation">
-            <iframe src="./components/navigation.html" frameborder="0"></iframe>
-        </div>
+  <navigation-component></navigation-component>
+  
+  <main id="content" class="container">
+    <div class="recipe-list">
+      <h1 data-i18n="myDoughs">My Dough Recipes</h1>
+      <button id="addNewBtn" class="add-new-btn" data-i18n="addNew">Add New Recipe</button>
+      <div id="recipeContainer" class="recipe-container">
+        <div class="empty-state" data-i18n="loading">Loading...</div>
+      </div>
     </div>
+  </main>
+
+  <script type="module">
+    import { setLanguage, currentLanguage, requireAuth, apiRequest, calculateIngredientQuantities } from './js/utils.js';
+    
+    // Set initial language
+    document.addEventListener('DOMContentLoaded', async () => {
+      setLanguage(currentLanguage);
+      
+      // Check if user is logged in
+      const isAuth = await requireAuth();
+      if (!isAuth) return;
+      
+      // Load recipes
+      loadRecipes();
+      
+      // Add event listeners
+      document.getElementById('addNewBtn').addEventListener('click', () => {
+        window.location.href = './pages/add-dough.html';
+      });
+      
+      // Language change event
+      window.addEventListener('languageChanged', () => {
+        loadRecipes();
+      });
+    });
+    
+    async function loadRecipes() {
+      try {
+        const recipes = await apiRequest('/recipes/');
+        renderRecipes(recipes);
+      } catch (error) {
+        console.error('Error loading recipes:', error);
+        const recipeContainer = document.getElementById('recipeContainer');
+        recipeContainer.innerHTML = '<div class="empty-state">Failed to load recipes. Please try again.</div>';
+      }
+    }
+    
+    function renderRecipes(recipes) {
+      const recipeContainer = document.getElementById('recipeContainer');
+      
+      if (!recipes || recipes.length === 0) {
+        recipeContainer.innerHTML = `<div class="empty-state" data-i18n="noRecipes">No recipes found. Add your first recipe!</div>`;
+        setLanguage(currentLanguage); // Update translations
+        return;
+      }
+      
+      recipeContainer.innerHTML = '';
+      
+      recipes.forEach(recipe => {
+        const recipeCard = document.createElement('div');
+        recipeCard.className = 'recipe-card';
+        recipeCard.dataset.recipeId = recipe.id;
+        
+        const flours = recipe.ingredients.filter(i => i.is_flour);
+        const others = recipe.ingredients.filter(i => !i.is_flour);
+        
+        recipeCard.innerHTML = `
+          <div class="recipe-header">
+            <h3 class="recipe-title">${recipe.name}</h3>
+            <div class="recipe-actions">
+              <button class="edit-btn" data-recipe-id="${recipe.id}" data-i18n="edit">Edit</button>
+              <button class="delete-btn" data-recipe-id="${recipe.id}" data-i18n="delete">Delete</button>
+            </div>
+          </div>
+          
+          <div class="ingredient-list">
+            <div class="ingredient-section">
+              <div class="section-title" data-i18n="flours">Flours</div>
+              ${flours.map(flour => `
+                <div class="ingredient-item">
+                  <span>${flour.name}</span>
+                  <span>${flour.percentage}%</span>
+                </div>
+              `).join('') || `<div class="empty-state">No flours added</div>`}
+            </div>
+            
+            <div class="ingredient-section">
+              <div class="section-title" data-i18n="otherIngredients">Other Ingredients</div>
+              ${others.map(ingredient => `
+                <div class="ingredient-item">
+                  <span>${ingredient.name}</span>
+                  <span>${ingredient.percentage}%</span>
+                </div>
+              `).join('') || `<div class="empty-state">No other ingredients added</div>`}
+            </div>
+          </div>
+          
+          <div class="calculation-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="doughUnitWeight-${recipe.id}" data-i18n="doughUnitWeight">Dough Unit Weight (g)</label>
+                <input type="number" id="doughUnitWeight-${recipe.id}" min="0" step="1">
+              </div>
+              <div class="form-group">
+                <label for="unitsNumber-${recipe.id}" data-i18n="unitsNumber">Number of Units</label>
+                <input type="number" id="unitsNumber-${recipe.id}" min="1" step="1">
+              </div>
+            </div>
+            <button class="calculate-btn" data-recipe-id="${recipe.id}" data-i18n="calculate">Calculate</button>
+            
+            <div class="results" id="results-${recipe.id}" style="display: none;"></div>
+          </div>
+        `;
+        
+        recipeContainer.appendChild(recipeCard);
+        
+        // Add event listeners for this recipe card
+        recipeCard.querySelector('.calculate-btn').addEventListener('click', () => {
+          calculateQuantities(recipe);
+        });
+        
+        recipeCard.querySelector('.edit-btn').addEventListener('click', () => {
+          window.location.href = `./pages/add-dough.html?id=${recipe.id}`;
+        });
+        
+        recipeCard.querySelector('.delete-btn').addEventListener('click', () => {
+          deleteRecipe(recipe.id);
+        });
+      });
+      
+      // Update translations
+      setLanguage(currentLanguage);
+    }
+    
+    function calculateQuantities(recipe) {
+      const doughUnitWeight = parseFloat(document.getElementById(`doughUnitWeight-${recipe.id}`).value);
+      const unitsNumber = parseInt(document.getElementById(`unitsNumber-${recipe.id}`).value);
+      
+      if (isNaN(doughUnitWeight) || isNaN(unitsNumber) || doughUnitWeight <= 0 || unitsNumber <= 0) {
+        alert('Please enter valid values for dough unit weight and number of units');
+        return;
+      }
+      
+      // Calculate total weight
+      const totalWeight = doughUnitWeight * unitsNumber;
+      
+      // Calculate ingredient quantities
+      const calculatedIngredients = calculateIngredientQuantities(recipe.ingredients, doughUnitWeight, unitsNumber);
+      
+      // Display results
+      const resultsElement = document.getElementById(`results-${recipe.id}`);
+      
+      resultsElement.innerHTML = `
+        <h4 data-i18n="calculationResults">Calculation Results</h4>
+        <p><span data-i18n="doughUnitWeight">Dough Unit Weight</span>: ${doughUnitWeight}g × <span data-i18n="unitsNumber">Number of Units</span>: ${unitsNumber}</p>
+        <p><span data-i18n="totalWeight">Total Weight</span>: ${totalWeight}g</p>
+        
+        <div class="ingredient-list">
+          ${calculatedIngredients.map(ingredient => `
+            <div class="ingredient-item">
+              <span>${ingredient.name}</span>
+              <span>${ingredient.quantity}g (${ingredient.percentage}%)</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      resultsElement.style.display = 'block';
+      
+      // Update translations
+      setLanguage(currentLanguage);
+    }
+    
+    async function deleteRecipe(recipeId) {
+      const { LANGUAGES, currentLanguage } = await import('./js/utils.js');
+      const translations = LANGUAGES[currentLanguage];
+      
+      if (!confirm(translations.confirmDelete)) {
+        return;
+      }
+      
+      try {
+        await apiRequest(`/recipes/${recipeId}/`, 'DELETE');
+        
+        // Reload recipes
+        loadRecipes();
+        
+      } catch (error) {
+        console.error('Error deleting recipe:', error);
+        alert('Failed to delete recipe. Please try again.');
+      }
+    }
+  </script>
 </body>
 </html>

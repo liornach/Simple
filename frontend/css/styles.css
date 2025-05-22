@@ -1,0 +1,274 @@
+/* Bakery-themed UI Design */
+:root {
+  --primary-color: #a16207; /* Warm brown */
+  --secondary-color: #854d0e; /* Darker brown */
+  --accent-color: #f59e0b; /* Golden yellow */
+  --background-color: #fef3c7; /* Light cream */
+  --text-color: #422006; /* Dark brown */
+  --border-color: #d4a76a; /* Light brown */
+  --box-shadow: 0 4px 12px rgba(161, 98, 7, 0.15);
+  --border-radius: 8px;
+  --success-color: #65a30d; /* Green */
+  --error-color: #b91c1c; /* Red */
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: var(--background-color);
+  background-image: url('../assets/flour-texture.png');
+  background-blend-mode: overlay;
+  padding: 0;
+  margin: 0;
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+/* Common components */
+.card {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  max-width: 500px;
+  margin: 2rem auto;
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+label {
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+input, select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fffbeb;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button[type="submit"] {
+  background-color: var(--success-color);
+}
+
+button[type="submit"]:hover {
+  background-color: #4d7c0f;
+}
+
+/* Header and navigation */
+.header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Language switch button */
+.lang-switch {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0;
+}
+
+.lang-switch:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Recipe cards */
+.recipe-list {
+  display: grid;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.recipe-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
+}
+
+.recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.recipe-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.recipe-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ingredient-list {
+  margin-bottom: 1rem;
+}
+
+.ingredient-section {
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-weight: bold;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.ingredient-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #f0e6d2;
+}
+
+/* Calculation form */
+.calculation-form {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.results {
+  margin-top: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  background-color: #fffbeb;
+}
+
+.add-new-btn {
+  display: block;
+  margin: 1rem auto;
+  background-color: var(--accent-color);
+}
+
+.add-new-btn:hover {
+  background-color: #d97706;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+/* RTL support for Hebrew */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .form-row,
+[dir="rtl"] .recipe-actions,
+[dir="rtl"] .nav-links,
+[dir="rtl"] .nav-right {
+  flex-direction: row-reverse;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .card {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  [dir="rtl"] .form-row {
+    flex-direction: column;
+  }
+}

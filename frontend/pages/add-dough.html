@@ -1,251 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dough Ingredient Form</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
-
-    body {
-      background: #f4f4f9;
-      padding: 2rem;
-    }
-
-    form {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 1.5rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .ingredient {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1rem;
-    }
-
-    label {
-      margin-bottom: 0.25rem;
-      font-weight: bold;
-      color: #333;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 2px #e9d5ff;
-    }
-
-    #newFlourOrIngredient {
-      border-top: 1px solid #ddd;
-      padding-top: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    #newFlourOrIngredient p {
-      font-weight: bold;
-      color: #4b5563;
-    }
-
-    button {
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      background-color: #7c3aed;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #5b21b6;
-    }
-
-    button[type="submit"] {
-      background-color: #10b981;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #059669;
-    }
-
-    #flours,
-    #otherIngredients {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        background-color: #f9fafb;
-    }
-
-    #flours::before,
-    #otherIngredients::before {
-        content: attr(data-title);
-        display: block;
-        font-weight: bold;
-        font-size: 1.1rem;
-        color: #374151;
-        margin-bottom: 0.75rem;
-    }
-
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Dough Recipe - Dough Calculator</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <script type="module" src="../components/web-components/navigation-component.js"></script>
 </head>
 <body>
-  <form id="addDough">
-    <div id="flours" data-title="Flours">
-        <div class="ingredient flour">
-          <label for="flour">Flour ( grams )</label>
-          <input type="number" name="flour" id="flour" />
-        </div>
-      </div>
+  <navigation-component></navigation-component>
+  
+  <main class="container">
+    <div class="card">
+      <h1 data-i18n="addDough">Add Dough Recipe</h1>
       
-      <div id="otherIngredients" data-title="Other Ingredients">
-        <div class="ingredient nonFlour">
-          <label for="water">Water ( grams )</label>
-          <input type="number" name="water" id="water" />
+      <form id="doughForm">
+        <div class="form-group">
+          <label for="recipeName" data-i18n="recipeName">Recipe Name</label>
+          <input type="text" id="recipeName" required>
         </div>
-      </div>
+        
+        <div class="ingredient-section">
+          <div class="section-title" data-i18n="flours">Flours</div>
+          <div id="floursContainer">
+            <!-- Flour ingredients will be added here -->
+            <div class="ingredient-item">
+              <div class="form-group">
+                <label for="flourName" data-i18n="name">Name</label>
+                <input type="text" id="flourName" placeholder="e.g., Bread Flour">
+              </div>
+              <div class="form-group">
+                <label for="flourPercentage" data-i18n="percentage">Percentage (%)</label>
+                <input type="number" id="flourPercentage" min="0" step="0.1" placeholder="e.g., 100">
+              </div>
+              <button type="button" id="addFlourBtn" class="add-btn">+</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="ingredient-section">
+          <div class="section-title" data-i18n="otherIngredients">Other Ingredients</div>
+          <div id="ingredientsContainer">
+            <!-- Other ingredients will be added here -->
+            <div class="ingredient-item">
+              <div class="form-group">
+                <label for="ingredientName" data-i18n="name">Name</label>
+                <input type="text" id="ingredientName" placeholder="e.g., Water">
+              </div>
+              <div class="form-group">
+                <label for="ingredientPercentage" data-i18n="percentage">Percentage (%)</label>
+                <input type="number" id="ingredientPercentage" min="0" step="0.1" placeholder="e.g., 70">
+              </div>
+              <button type="button" id="addIngredientBtn" class="add-btn">+</button>
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" data-i18n="submit">Submit</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module">
+    import { setLanguage, currentLanguage, requireAuth, apiRequest } from '../js/utils.js';
+    
+    // Set initial language
+    document.addEventListener('DOMContentLoaded', async () => {
+      setLanguage(currentLanguage);
       
-
-    <div id="newFlourOrIngredient">
-      <p>Add new flour or ingredient:</p>
-      <div class="ingredient">
-        <label for="ingredientName">Name:</label>
-        <input type="text" name="ingredient-name" id="ingredientName" />
-      </div>
-      <div class="ingredient">
-          <label for="flourOrIngredient">Flour or ingredient?</label>
-          <select name="flour-or-ingredient" id="flourOrIngredient">
-              <option value="flour">Flour</option>
-              <option value="ingredient">Ingredient</option>
-            </select>
-        </div>
-      <button type="button" id="addIngredientButton">Add ingredient</button>
-    </div>
-    <button type="submit">Submit</button>
-  </form>
-
-  <template id="ingredient-template">
-    <div class="ingredient">
-      <label for=""></label>
-      <input type="number" name="" id="" />
-    </div>
-  </template>
-
-  <script>
-
-    function extractIngredientData(sectionElement) {
-        const inputs = sectionElement.querySelectorAll('input[type="number"]');
-        const data = {};
-
-        inputs.forEach(input => {
-            const name = input.name || input.id;
-            const value = parseFloat(input.value);
-            if (!isNaN(value)) {
-            data[name] = value;
-            }
-        });
-
-        return data;
-    }
-
-    const getIngredientNameInput = () => document.getElementById('ingredientName');
-    const getFlourOrIngredientInput = () => document.getElementById('flourOrIngredient');
-    const template = document.getElementById('ingredient-template');
-    const cloneTemplate = () => template.content.cloneNode(true);
-
-    document.getElementById('addIngredientButton').addEventListener('click', (e) => {
-      e.preventDefault();
-      const nameInput = getIngredientNameInput();
-      const name = nameInput.value.trim();
-      if (!name) return;
-
-      const flourOrIngredient = getFlourOrIngredientInput().value;
-      const appendToId = flourOrIngredient === 'flour' ? "flours" : "otherIngredients";
-      const appendTo = document.getElementById(appendToId);
-
-      const clonedTemplate = cloneTemplate();
-      const label = clonedTemplate.querySelector('label');
-      const input = clonedTemplate.querySelector('input');
-
-      const safeName = name.toLowerCase().replace(/\s+/g, '-');
-
-      label.setAttribute('for', safeName);
-      label.textContent = name;
-
-      input.setAttribute('id', safeName);
-      input.setAttribute('name', safeName);
-
-      appendTo.appendChild(clonedTemplate);
-      nameInput.value = '';
+      // Check if user is logged in
+      const isAuth = await requireAuth();
+      if (!isAuth) return;
+      
+      // Check if editing existing recipe
+      const urlParams = new URLSearchParams(window.location.search);
+      const recipeId = urlParams.get('id');
+      
+      if (recipeId) {
+        loadRecipe(recipeId);
+      }
+      
+      // Add event listeners
+      setupEventListeners();
+      
+      // Language change event
+      window.addEventListener('languageChanged', () => {
+        setLanguage(currentLanguage);
+      });
     });
-
-    document.getElementById('addDough').addEventListener('submit', async (e) => {
+    
+    // Recipe data
+    const recipeData = {
+      id: null,
+      name: '',
+      flours: [],
+      ingredients: []
+    };
+    
+    function setupEventListeners() {
+      // Add flour button
+      document.getElementById('addFlourBtn').addEventListener('click', () => {
+        addIngredient('flour');
+      });
+      
+      // Add ingredient button
+      document.getElementById('addIngredientBtn').addEventListener('click', () => {
+        addIngredient('ingredient');
+      });
+      
+      // Form submission
+      document.getElementById('doughForm').addEventListener('submit', (e) => {
         e.preventDefault();
-
-        const loggedIn = await isLoggedIn();
-        if (!loggedIn) {
-            window.location.href = '../pages/login.html';
-            return;
+        saveRecipe();
+      });
+    }
+    
+    function addIngredient(type) {
+      const nameInput = document.getElementById(type === 'flour' ? 'flourName' : 'ingredientName');
+      const percentageInput = document.getElementById(type === 'flour' ? 'flourPercentage' : 'ingredientPercentage');
+      
+      const name = nameInput.value.trim();
+      const percentage = parseFloat(percentageInput.value);
+      
+      if (!name || isNaN(percentage)) {
+        alert('Please enter both name and percentage');
+        return;
+      }
+      
+      // Add to recipe data
+      if (type === 'flour') {
+        recipeData.flours.push({ name, percentage, is_flour: true });
+      } else {
+        recipeData.ingredients.push({ name, percentage, is_flour: false });
+      }
+      
+      // Clear inputs
+      nameInput.value = '';
+      percentageInput.value = '';
+      
+      // Update display
+      updateIngredientsDisplay();
+    }
+    
+    function updateIngredientsDisplay() {
+      // Update flours display
+      const floursContainer = document.getElementById('floursContainer');
+      const flourInputRow = floursContainer.querySelector('.ingredient-item');
+      
+      // Clear existing items except the input row
+      while (floursContainer.children.length > 1) {
+        floursContainer.removeChild(floursContainer.children[0]);
+      }
+      
+      // Add flour items
+      recipeData.flours.forEach((flour, index) => {
+        const item = document.createElement('div');
+        item.className = 'ingredient-item';
+        item.innerHTML = `
+          <div class="ingredient-name">${flour.name}</div>
+          <div class="ingredient-percentage">${flour.percentage}%</div>
+          <button type="button" class="remove-btn" data-type="flour" data-index="${index}">×</button>
+        `;
+        
+        floursContainer.insertBefore(item, flourInputRow);
+      });
+      
+      // Update ingredients display
+      const ingredientsContainer = document.getElementById('ingredientsContainer');
+      const ingredientInputRow = ingredientsContainer.querySelector('.ingredient-item');
+      
+      // Clear existing items except the input row
+      while (ingredientsContainer.children.length > 1) {
+        ingredientsContainer.removeChild(ingredientsContainer.children[0]);
+      }
+      
+      // Add ingredient items
+      recipeData.ingredients.forEach((ingredient, index) => {
+        const item = document.createElement('div');
+        item.className = 'ingredient-item';
+        item.innerHTML = `
+          <div class="ingredient-name">${ingredient.name}</div>
+          <div class="ingredient-percentage">${ingredient.percentage}%</div>
+          <button type="button" class="remove-btn" data-type="ingredient" data-index="${index}">×</button>
+        `;
+        
+        ingredientsContainer.insertBefore(item, ingredientInputRow);
+      });
+      
+      // Add event listeners to remove buttons
+      document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const type = e.target.dataset.type;
+          const index = parseInt(e.target.dataset.index);
+          
+          if (type === 'flour') {
+            recipeData.flours.splice(index, 1);
+          } else {
+            recipeData.ingredients.splice(index, 1);
+          }
+          
+          updateIngredientsDisplay();
+        });
+      });
+    }
+    
+    async function loadRecipe(recipeId) {
+      try {
+        const recipe = await apiRequest(`/recipes/${recipeId}/`);
+        
+        // Set recipe data
+        recipeData.id = recipe.id;
+        recipeData.name = recipe.name;
+        
+        // Set recipe name in form
+        document.getElementById('recipeName').value = recipe.name;
+        
+        // Set ingredients
+        recipe.ingredients.forEach(ingredient => {
+          if (ingredient.is_flour) {
+            recipeData.flours.push(ingredient);
+          } else {
+            recipeData.ingredients.push(ingredient);
+          }
+        });
+        
+        // Update display
+        updateIngredientsDisplay();
+        
+      } catch (error) {
+        console.error('Error loading recipe:', error);
+        alert('Failed to load recipe. Please try again.');
+      }
+    }
+    
+    async function saveRecipe() {
+      const recipeName = document.getElementById('recipeName').value.trim();
+      
+      if (!recipeName) {
+        alert('Please enter a recipe name');
+        return;
+      }
+      
+      if (recipeData.flours.length === 0) {
+        alert('Please add at least one flour');
+        return;
+      }
+      
+      recipeData.name = recipeName;
+      
+      try {
+        let recipe;
+        
+        if (recipeData.id) {
+          // Update existing recipe
+          recipe = await apiRequest(`/recipes/${recipeData.id}/`, 'PUT', {
+            name: recipeData.name
+          });
+          
+          // Delete existing ingredients
+          const existingIngredients = await apiRequest(`/recipes/${recipeData.id}/ingredients/`);
+          for (const ingredient of existingIngredients) {
+            await apiRequest(`/ingredients/${ingredient.id}/`, 'DELETE');
+          }
+        } else {
+          // Create new recipe
+          recipe = await apiRequest('/recipes/', 'POST', {
+            name: recipeData.name
+          });
         }
-
-        const floursData = extractIngredientData(document.getElementById('flours'));
-        const ingredientsData = extractIngredientData(document.getElementById('otherIngredients'));
-
-        const payload = {
-            flours: floursData,
-            ingredients: ingredientsData
-        };
-
-        try {
-            const response = await fetch('http://localhost:8000/api/submit-dough', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-
-            if (!response.ok) {
-            throw new Error("Server responded with status: " + response.status);
-            }
-
-            alert("Dough recipe submitted successfully!");
-        } catch (error) {
-            console.error("Failed to submit:", error);
-            alert("Failed to submit dough recipe.");
+        
+        // Add ingredients
+        const allIngredients = [...recipeData.flours, ...recipeData.ingredients];
+        
+        for (const ingredient of allIngredients) {
+          await apiRequest(`/recipes/${recipe.id}/ingredients/`, 'POST', {
+            name: ingredient.name,
+            percentage: ingredient.percentage,
+            is_flour: ingredient.is_flour
+          });
         }
-    });
-
-
-    async function isLoggedIn() {
-        return new Promise(resolve=> {
-            setTimeout(()=> {
-                const fakeUserLoggedIn = true;
-                resolve(fakeUserLoggedIn);
-            }, 500)
-        })
+        
+        alert('Recipe saved successfully!');
+        window.location.href = '../index.html';
+        
+      } catch (error) {
+        console.error('Error saving recipe:', error);
+        alert('Failed to save recipe. Please try again.');
+      }
     }
   </script>
-  
 </body>
 </html>
